@@ -1,0 +1,490 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    --yellow: #ffba00;
+    --green: #006633;
+    --light-green: #008d47;
+    --red: #b70000;
+    --grey: #6b6b6b;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+input,
+select,
+button {
+    box-sizing: border-box;
+}
+
+*,
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+ul {
+    list-style: none;
+}
+
+.container {
+    padding: 0 20px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+}
+
+select {
+    padding: 5px;
+}
+
+input {
+    border: 1px solid #7e7e7e;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+input::placeholder {
+    font-size: 12px;
+}
+
+label,
+p {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 600;
+    color: var(--grey);
+}
+
+label.title {
+    color: var(--light-green);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+label i {
+    font-weight: normal;
+}
+
+button.btn {
+    font-size: 14px;
+    color: white;
+    font-weight: 600;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+}
+
+button.primary {
+    background-color: var(--green);
+}
+
+button.secondary {
+    background-color: var(--yellow);
+}
+
+button.tertiary {
+    background-color: var(--red);
+}
+
+button.link {
+    font-size: 14px;
+    line-height: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+#navigation button.link {
+    padding: 10px 0;
+}
+
+.panel.active {
+    display: block;
+}
+
+.panel {
+    display: none;
+    animation: fadeEffect 1s;
+    height: 100%;
+}
+
+@keyframes fadeEffect {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.link.active {
+    color: var(--yellow);
+}
+
+.vehicles-wrapper li,
+#users-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid #cacaca;
+}
+
+.notification-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #cacaca;
+}
+
+#rental-info .info-wrapper {
+    border-top: 1px solid #cacaca;
+}
+
+#notifications-btn .badge {
+    background-color: var(--red);
+    top: 0;
+    right: -5px;
+    border-radius: 50%;
+}
+
+h3 {
+    font-size: 14px;
+    font-weight: normal;
+    color: var(--grey);
+}
+
+h5 {
+    font-size: 12px;
+    font-weight: normal;
+    color: var(--grey);
+}
+
+span {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#profile .wrapper h4 {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--grey);
+}
+
+.badge {
+    padding: 3px 5px;
+    border-radius: 5px;
+    color: var(--white);
+    font-size: 10px;
+    line-height: 12px;
+    width: fit-content;
+    height: fit-content;
+}
+
+.badge.green {
+    background-color: var(--light-green);
+}
+
+.badge.yellow {
+    background-color: var(--yellow);
+}
+
+.badge.red {
+    background-color: var(--red);
+}
+
+
+button.icon {
+    background-color: transparent;
+    border: transparent;
+    cursor: pointer;
+}
+
+button.icon img {
+    width: 50px;
+    height: 50px;
+}
+
+button.link.icon img {
+    width: 25px;
+    height: 25px;
+}
+
+
+#snackbar {
+    display: none;
+}
+
+#snackbar.show {
+    width: 100%;
+    min-width: 250px;
+    background-color: #fff;
+    color: var(--green);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 18px;
+    transition: opacity 0.5s;
+    box-shadow: 0 0 10px 0 #333;
+    display: block;
+}
+
+.overflow-y-scroll {
+    overflow-y: scroll;
+}
+
+
+.map {
+    width: 100%;
+    min-height: 250px;
+}
+
+.map .gm-style-iw-chr {
+    position: absolute;
+    right: 0;
+}
+
+.map .gm-style-iw-d {
+    margin-top: 10px;
+}
+
+.map .gm-style-iw {
+    min-width: 250px !important;
+}
+
+.vehicles-wrapper,
+.form-group-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.validation-msg,
+.validation-msg li {
+    font-size: 12px;
+    line-height: 15px;
+}
+
+/* Make scrollable */
+.vehicles,
+.form-group {
+    flex: 1;
+    overflow-y: auto;
+}
+
+
+/* Navigation */
+.nav-wrapper {
+    border-top: 1px solid #cecece;
+}
+
+.nav-wrapper button {
+    color: var(--grey);
+}
+
+
+
+.hidden {
+    display: none;
+}
+
+.rounded-nav-btn button {
+    background-color: Var(--green);
+    border-radius: 50px;
+    border: 3px solid var(--white);
+    margin-top: -20px;
+    width: 50px;
+    height: 50px;
+    animation: bounce-twice 5s ease-in-out infinite;
+}
+
+.rounded-nav-btn button.active {
+    animation: none;
+    background-color: var(--yellow);
+}
+
+@keyframes bounce-twice {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    5% {
+        transform: translateY(-15px);
+    }
+
+    10% {
+        transform: translateY(0);
+    }
+
+    15% {
+        transform: translateY(-10px);
+    }
+
+    20% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(0);
+        /* Wait for the next cycle */
+    }
+}
+
+.vehicle-action {
+    color: var(--white);
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.vehicle-action.green {
+    background-color: var(--green);
+}
+
+.vehicle-action.red {
+    background-color: var(--red);
+}
+
+.vehicle-action.yellow {
+    background-color: var(--yellow);
+}
+
+body.tour-show::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 5;
+}
+
+#startTour {
+    position: relative;
+    z-index: 5;
+    top: 40%;
+    width: 100px;
+    background-color: var(--white);
+    border: none;
+    color: var(--green);
+    padding: 10px;
+    margin: 0 auto;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.introjs-tooltiptext,
+.introjs-button {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.introjs-nextbutton {
+    background-color: var(--light-green) !important;
+    color: var(--white) !important;
+    text-shadow: unset !important;
+}
+
+.toggle-password svg {
+    width: 15px;
+}
+
+.toggle-password {
+    right: 10px;
+    top: 20px;
+}
+
+.agreement-text p {
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+/* Slider */
+.box.carousel {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+}
+
+.carousel-wrapper {
+    display: flex;
+    width: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item {
+    width: 100%;
+    height: 200px;
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    background-position: center;
+}
+
+/* Navigation Buttons */
+.carousel-buttons {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.carousel-buttons button {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+}
+
+.carousel-buttons button:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+button span {
+    font-weight: 500;
+}
+
+#admin .link {
+    padding: 5px;
+    background-color: var(--green);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 5px;
+}

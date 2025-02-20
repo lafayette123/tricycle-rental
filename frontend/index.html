@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <title>Rental App</title>
+
+    <!-- Intro.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+</head>
+
+<body class="relative flex col">
+
+    <button id="startTour">Start Tour</button>
+
+    <div id="snackbar" class="hide" style="width: -moz-available;">
+
+    </div>
+
+    <div id="main" class="flex col overflow-y-scroll" style="height: 90%;">
+        <div id="logo-wrapper" class="logo-wrapper w-100">
+            <div class="container">
+                <div class="flex jc-center pt-20 pb-20">
+                    <a href="/">
+                        <img src="assets/tricycle.png" alt="Logo" class="logo w-100" />
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="auth-wrapper" class="tab-wrapper">
+            <div id="register" class="panel">
+                <div class="container">
+                    <div class="flex col h-100">
+                        <form id="registerForm" class="flex col">
+                            <div class="flex col mb-20">
+                                <label>First Name</label>
+                                <input type="text" id="firstname" placeholder="John" required>
+                            </div>
+                            <div class="flex col mb-20">
+                                <label>Last Name</label>
+                                <input type="text" id="lastname" placeholder="Doe" required>
+                            </div>
+                            <div class="flex col mb-20">
+                                <label>Phone Number</label>
+                                <input type="text" id="register_mobile_number" placeholder="+639123456789" required>
+                            </div>
+                            <div class="flex col mb-20">
+                                <label>Email</label>
+                                <input type="email" id="register_email" placeholder="name@mail.com" required>
+                                <span id="register_email_validation" class="validation-msg mt-10"
+                                    style="color: red;"></span>
+                            </div>
+                            <div class="flex col mb-20 relative">
+                                <label>Password</label>
+                                <input type="password" id="register_password"
+                                    data-validation-target="register_password_validation_list" placeholder="*****"
+                                    required>
+                                <span class="toggle-password absolute">
+                                    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12Z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </span>
+                                <ul id="register_password_validation_list" class="validation-msg mt-10"></ul>
+                            </div>
+                            <div class="flex  gap-20">
+                                <button class="btn primary w-100" type="submit">Register</button>
+                            </div>
+                        </form>
+                        <div class="link-wrapper flex jc-center mt-20 mb-20">
+                            <div class="flex  gap-20">
+                                <button class="link primary w-100" onclick="openPanel(event, 'login')"
+                                    id="defaultOpenAuth">Login</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="login" class="panel">
+                <div class="container">
+                    <div class="flex col h-100">
+                        <form id="loginForm" class="flex col">
+                            <div class="flex col mb-20">
+                                <label>Email</label>
+                                <input type="email" id="login_email" placeholder="name@mail.com" required>
+                                <span id="login_email_validation" class="validation-msg mt-5"
+                                    style="color: red;"></span>
+                            </div>
+                            <div class="flex col mb-20 relative">
+                                <label>Password</label>
+                                <input type="password" id="login_password"
+                                    data-validation-target="login_password_validation_list" placeholder="*****"
+                                    required>
+                                <span class="toggle-password absolute">
+                                    <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12Z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </span>
+                                <span id="login_password_validation" class="validation-msg mt-5"
+                                    style="color: red;"></span>
+                            </div>
+                            <div class="flex gap-20">
+                                <button class="btn primary w-100" type="submit">Login</button>
+                            </div>
+                        </form>
+                        <div class="link-wrapper flex jc-center mt-20 mb-20">
+                            <div class="flex  gap-20">
+                                <button class="link primary w-100"
+                                    onclick="openPanel(event, 'register')">Register</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="setup-profile" class="panel">
+                <div class="container">
+                    <div class="mb-10 pt-20">
+                        <label class="title">Profile Information</label>
+                    </div>
+                    <form id="setupProfileForm" class="flex col">
+                        <div class="flex col mb-20">
+                            <label>Address</label>
+                            <label>(Search places and pin your location in map by tapping)</label>
+                            <input type="text" id="address" placeholder="Brgy. 1, Cadiz City">
+                            <input type="hidden" id="latitude">
+                            <input type="hidden" id="longitude">
+                        </div>
+
+                        <div id="map-registration" class="map mb-20"></div> <!-- Map container -->
+
+                        <div class="flex col mb-20">
+                            <label>I am</label>
+                            <select id="user_type">
+                                <option value="1">Owner</option>
+                                <option value="0">Renter</option>
+                            </select>
+                        </div>
+                        <div class="flex  gap-20">
+                            <button class="btn primary w-100" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="transction-wrapper" class="content-wrapper pt-20 h-100">
+
+            <div id="home" class="panel">
+                <div class="container">
+
+                    <div class="flex col mb-10">
+                        <label class="title">Home</label>
+                    </div>
+
+                    <div class="box carousel br-rounded-lg w-100 mb-10">
+                        <div class="carousel-wrapper" id="carousel">
+                            <div class="carousel-item" style="background-image: url(assets/images/slide-1.png);">
+
+                            </div>
+                            <div class="carousel-item" style="background-image: url(assets/images/slide-2.png);">
+
+                            </div>
+                            <div class="carousel-item" style="background-image: url(assets/images/slide-3.png);">
+
+                            </div>
+                        </div>
+        
+                        <!-- Navigation Buttons -->
+                        <div class="carousel-buttons">
+                            <button onclick="prevSlide()">❮</button>
+                            <button onclick="nextSlide()">❯</button>
+                        </div>
+                    </div>
+
+                    <div id="vehicle-tracking" style="display: none;">
+                        <label class="title">Vehicle Tracking</label>
+                        <!-- <button id="toggleTracking">Start Tracking</button> -->
+                        <div id="map-tracking" style="height: 300px; width: 100%;"></div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div id="add-vehicle" class="panel">
+                <div class="container">
+
+                    <div class="mb-10 flex jc-space-between ai-center">
+                        <label class="title">Register a Vehicle</label>
+                        <button id="view-my-vehicles" class="link owner-btn"
+                            onclick="openPanel(event, 'view-vehicles')">My Vehicles</button>
+                    </div>
+
+                    <div class="flex col h-100">
+
+                        <form id="registerVehicleForm" class="form-group-wrapper flex col mb-20">
+
+                            <div id="" class="form-group">
+                                <div class="flex col mb-20">
+                                    <label>Number</label>
+                                    <input type="text" id="number" placeholder="0001" required>
+                                </div>
+                                <div class="flex col mb-20">
+                                    <label>Make</label>
+                                    <input type="text" id="make" placeholder="Kawasaki Barako" required>
+                                </div>
+                                <div class="flex col mb-20">
+                                    <label>Year Model</label>
+                                    <input type="text" id="model" placeholder="2020" required>
+                                </div>
+                                <div class="flex col mb-20">
+                                    <label>Price Per Day ( ₱ )</label>
+                                    <input type="number" id="price" min="100" placeholder="₱ 100" required>
+                                </div>
+                                <!-- <div class="flex col mb-20">
+                                        <label>Status</label>
+                                        <select id="status">
+                                            <option value="Available">Available</option>
+                                            <option value="On-rent">On-rent</option>
+                                        </select>
+                                    </div> -->
+
+                                <div class="flex col mb-20">
+                                    <label>Location Address</label>
+                                    <label><i>(Search places and pin the location of vehicle by tapping the
+                                            map)</i></label>
+                                    <input type="text" id="location" placeholder="Brgy. 1, Cadiz City">
+                                    <input type="hidden" id="vehicle-latitude">
+                                    <input type="hidden" id="vehicle-longitude">
+                                </div>
+
+                                <div id="map-vehicle-registration" class="map mb-20"></div>
+
+                                <div class="flex col gap-10">
+                                    <button class="btn primary w-100" type="submit">Register</button>
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="edit-vehicle" class="panel">
+                <div class="container">
+
+                    <div class="mb-10 flex jc-space-between ai-center">
+                        <label class="title">Update a Vehicle</label>
+                        <button id="view-my-vehicles" class="link owner-btn"
+                            onclick="openPanel(event, 'view-vehicles')">My Vehicles</button>
+                    </div>
+
+                    <div class="flex col h-100">
+
+                        <form id="updateVehicleForm" class="form-group-wrapper flex col mb-20">
+                            <input type="hidden" id="update-vehicle-id">
+                            <div id="" class="form-group">
+                                <div class="flex col mb-20">
+                                    <label>Number</label>
+                                    <input type="text" id="update-vehicle-number" placeholder="0001" required>
+                                </div>
+                                <div class="flex col mb-20">
+                                    <label>Make</label>
+                                    <input type="text" id="update-vehicle-make" placeholder="Kawasaki Barako" required>
+                                </div>
+                                <div class="flex col mb-20">
+                                    <label>Year Model</label>
+                                    <input type="text" id="update-vehicle-model" placeholder="2020" required>
+                                </div>
+                                <div class="flex col mb-20">
+                                    <label>Price Per Day ( ₱ )</label>
+                                    <input type="number" id="update-vehicle-price" min="100" placeholder="₱ 100"
+                                        required>
+                                </div>
+
+                                <div class="flex col gap-10">
+                                    <button class="btn primary w-100" type="submit">Update</button>
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="rent-vehicle" class="panel">
+                <div class="container">
+
+                    <div class="mb-10 flex jc-space-between ai-center">
+                        <label class="title">Rent a Vehicle</label>
+                    </div>
+
+                    <div class="vehicles-wrapper mb-10">
+                        <h5>Trycicle no: <span id="vehicle-number"></span></h5>
+                        <h5>Make: <span id="vehicle-make"></span></h5>
+                        <h5>Year Model: <span id="vehicle-model"></span></h5>
+                        <h5>Price: ₱ <span id="vehicle-price"></span></h5>
+
+                        <h5>Distance: <span id="vehicle-distance"></span></h5>
+                        <h5>Duration: <span id="vehicle-duration"></span></h5>
+                    </div>
+
+                    <div id="rental-form" class="flex col h-100">
+
+                        <form id="rentForm" class="form-group-wrapper flex col mb-20">
+                            <input type="hidden" id="vehicle-id">
+                            <input type="hidden" id="renter-id">
+
+                            <div id="" class="form-group">
+
+                                <div class="flex col mb-20">
+                                    <label>Rent Duration (in days)</label>
+                                    <input type="number" id="rent-duration" placeholder="9..." required>
+                                </div>
+
+                                <div class="flex col mb-20">
+                                    <h5>Total Price: ₱ <span id="total-price">0</span></h5>
+                                </div>
+
+                                <div class="flex col mb-20">
+                                    <label>Payment would be in-person</label>
+                                    <label>(Payment Online Coming Soon...)</label>
+                                </div>
+
+                                <div class="flex col gap-10">
+                                    <button class="btn primary w-100" type="submit">Confirm Rent</button>
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <div id="rental-info" class="flex col gap-10">
+                        <div id="renter-details" class="info-wrapper mb-10">
+                            <label class="title">Renter Details</label>
+                            <h5>Name: <span id="renter-name"></span></h5>
+                            <h5>Phone: <span id="renter-number"></span></h5>
+                            <h5>Address: <span id="renter-address"></span></h5>
+                        </div>
+                        <div id="owner-details" class="info-wrapper mb-10">
+                            <label class="title">Owner Details</label>
+                            <h5>Name: <span id="owner-name"></span></h5>
+                            <h5>Phone: <span id="owner-number"></span></h5>
+                            <h5>Address: <span id="owner-address"></span></h5>
+                        </div>
+                        <button id="confirm-rental-btn" data-id="" class="btn primary w-100" type="button">Confirm Rental</button>
+                        <button id="turnover-rental-btn" data-id="" class="btn primary w-100" type="button">Turnover Vehicle</button>
+                        <button id="approve-rental-btn" data-id="" class="btn primary w-100" type="button">Approve Rental</button>
+                        <button id="decline-rental-btn" data-id="" class="btn tertiary w-100" type="button">Decline</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="agreement-documentation" class="panel">
+                <div class="container">
+
+                    <div class="mb-10 flex jc-space-between ai-center">
+                        <label class="title">Agreement & Documentation</label>
+                    </div>
+
+                    <div class="mb-10">
+                        <label class="title">Owner Details</label>
+                        <h5>Name: <span id="ad-owner-name"></span></h5>
+                        <h5>Contact: <span id="ad-owner-contact"></span></h5>
+                        <h5>Email: <span id="ad-owner-email"></span></h5>
+                    </div>
+
+                    <div class="mb-10">
+                        <label class="title">Renter Details</label>
+                        <h5>Name: <span id="ad-renter-name"></span></h5>
+                        <h5>Contact: <span id="ad-renter-contact"></span></h5>
+                        <h5>Email: <span id="ad-renter-email"></span></h5>
+                    </div>
+
+                    <div class="mb-10">
+                        <label class="title">Vehicle Details</label>
+                        <h5>Make & Model: <span id="ad-make-model"></span></h5>
+                        <h5>Rental Period: <span id="ad-rental-period"></span></h5>
+                        <h5>Rental Fee: <span id="ad-price"></span></h5>
+                    </div>
+
+                    <div class="mb-10">
+                        <label class="title">Agreement Terms</label>
+                        <div class="agreement-text">
+                            <p>✓ The Renter agrees to return the vehicle in the same condition as received.</p>
+                            <p>✓ The Renter is responsible for fuel costs, toll fees, and parking charges.</p>
+                            <p>✓ The Renter shall not use the vehicle for illegal activities or reckless driving.</p>
+                            <p>✓ The Renter agrees to notify the Owner in case of any accident or damage.</p>
+                            <p>✓ Late returns will incur a penalty of ₱100 per hour.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-container mb-20">
+                        <input type="checkbox" id="agreeCheckbox">
+                        <label for="agreeCheckbox">I agree to the terms and conditions of this rental agreement.</label>
+                    </div>
+                    <button id="confirmAgreement" data-id="" class="btn primary w-100" disabled>Submit Agreement</button>
+                    
+                </div>
+            </div>
+
+            <div id="view-vehicles" class="panel">
+                <div class="container">
+                    <div class="flex col h-100">
+
+                        <div class="vehicles-wrapper">
+                            <div class="mb-10">
+                                <label class="title">My Vehicles</label>
+                            </div>
+                            <ul id="user-vehicles" class="vehicles">
+
+                            </ul>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="view-vehicle-history" class="panel">
+                
+                <div class="container">
+                    <div class="flex col h-100">
+
+                        <div class="vehicles-wrapper">
+                            <div class="flex jc-space-between ai-center">
+                                <label class="title">Rent History</label>
+                                <button id="view-my-vehicles" class="link owner-btn" onclick="openPanel(event, 'view-vehicles')">My Vehicles</button>
+                            </div>
+                            <div class="mb-10">
+                                <label class="">Tricycle No: <span id="history-tricycle-number"></span></label>
+                            </div>
+                            <ul id="vehicle-history" class="vehicles">
+
+                            </ul>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="search" class="panel">
+                <div class="container">
+
+                    <div class="flex col h-100">
+
+                        <div class="mb-10 flex jc-space-between ai-center">
+                            <label class="title">Search Location</label>
+                        </div>
+
+                        <input type="text" id="search-location" placeholder="Brgy. 1, Cadiz City" required>
+                        <input type="hidden" id="search-latitude">
+                        <input type="hidden" id="search-longitude">
+
+                        <div class="vehicles-wrapper mt-20 relative">
+                            <div class="mb-10">
+                                <label class="title">Results</label>
+                            </div>
+
+
+                            <div id="map-search" class="map mb-20"></div> <!-- Map container -->
+
+                            <!-- Results List -->
+                            <div id="vehicle-list-result" class="vehicles-list overflow-y-scroll"></div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="notifications" class="panel">
+                <div class="container">
+
+                    <div class="mb-10 flex jc-space-between ai-center">
+                        <label class="title">Notifications</label>
+                    </div>
+
+                    <div id="notification-wrapper" class="map-wrapper w-100">
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="all-users" class="panel">
+
+                <div class="container">
+    
+                    <div class="flex col mb-10">
+                        <label class="title">All Users</label>
+                    </div>
+
+                    <div class="overflow-y-scroll">
+                        <div id="users-list"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="profile" class="panel">
+                <div class="container">
+                    <div class="wrapper">
+                        <div id="profile-wrapper" class="flex col mb-20">
+
+                        </div>
+                    </div>
+
+                    <div id="admin">
+                        <label class="title">Admin</label>
+
+                        <div class="flex gap-10">
+                            <div class="admin flex jc-space-between ai-center mt-10 mb-10">
+                                <button id="all-users-btn" class="link flex gap-5 ai-center" onclick="openPanel(event, 'all-users')">
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        viewBox="0 0 24 24" 
+                                        width="15" 
+                                        height="15" 
+                                        fill="currentColor">
+                                        <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 2.06 1.97 3.45v2h6v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    <span>All Users</span>
+                                </button> 
+                            </div>
+
+                        </div>
+                        
+                    </div>
+
+                    <div class="link-wrapper mt-20 mb-20">
+                        <div class="flex  gap-20">
+                            <button class="btn primary w-100" onclick="logout()">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="navigation" class="nav-wrapper bg-white w-100 relative z-3" style="margin-top: auto;">
+        <div class="container">
+            <ul class="wrapper flex jc-space-between">
+
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/index.js"></script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqaUGMPTgVzYFd0-yFpsk0_uzj9x4EWQE&libraries=places&callback=initMap" async defer></script>
+
+    <!-- Intro.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
+</body>
+
+</html>
