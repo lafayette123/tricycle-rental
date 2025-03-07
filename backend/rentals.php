@@ -11,14 +11,23 @@ $action = $_GET['action'];
 switch ($action) {
     case 'rent_vehicle':
 
+        $rentalId = $_GET['rental_id'];
         $vehicleId = $_POST['vehicle_id'];
         $renterId = $_POST['renter_id'];
         $duration = $_POST['duration'];
         $status = $_POST['status'];
+        $extend = $_GET['extend'];
+
+        if($extend == 1) {
+            $queryOldTransaction = "UPDATE rent SET transaction = 'Done' WHERE rental_id = ?";
+            $stmt1 = $conn->prepare($queryOldTransaction);
+            $stmt1->bind_param("i", $rentalId);
+            $stmt1->execute();
+        }
     
-        $query = "INSERT INTO rent (vehicle_id, renter_id, duration, status) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO rent (vehicle_id, renter_id, duration, status, extend) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("iiss", $vehicleId, $renterId, $duration, $status);
+        $stmt->bind_param("iissi", $vehicleId, $renterId, $duration, $status, $extend);
     
         if ($stmt->execute()) {
             echo json_encode(["status" => 200, "message" => "Rent vehicle successful, please wait for some moment for the owner to approve your rental request. Thankyou!"]);

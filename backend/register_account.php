@@ -46,8 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['step'] == 2 && !empty($_POST
     $latitude = $_POST['latitude'];
     $user_type = $_POST['user_type'];
     $user_id = $_POST['user_id'];
+    $license_number = $_POST['license_number'];
     
-    $query = "UPDATE users SET address = '$address', longitude = '$longitude', latitude = '$latitude', vehicle_owner = '$user_type' WHERE user_id = '$user_id'";
+    $query = "UPDATE users SET address = '$address', longitude = '$longitude', latitude = '$latitude', vehicle_owner = '$user_type', license_number = '$license_number' WHERE user_id = '$user_id'";
     if ($conn->query($query) === TRUE) {
         echo json_encode(["status" => 200, "message" => "Registration successful", "user_type" => $user_type]);
     } else {

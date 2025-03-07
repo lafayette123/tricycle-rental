@@ -1,5 +1,5 @@
-// var server = 'https://onetechzquad.tech/etryc';
-var server = 'http://localhost/tricycle_rental/backend/';
+var server = 'https://tqprojects.fun/cedar_app/tricycle_rental';
+// var server = 'http://localhost/tricycle_rental/backend/';
 
 // Default City Location (Cadiz City)
 var latitude = 10.9561;
@@ -113,6 +113,7 @@ document.getElementById('setupProfileForm').addEventListener('submit', async fun
   const latitude = document.getElementById('latitude').value;
   const longitude = document.getElementById('longitude').value;
   const user_type = document.getElementById('user_type').value;
+  const license_number = document.getElementById('license_number').value;
 
   const email = document.getElementById('register_email').value;
   const password = document.getElementById('register_password').value;
@@ -124,7 +125,7 @@ document.getElementById('setupProfileForm').addEventListener('submit', async fun
     try {
       const response = await fetch(`${server}/register_account.php?step=2`, {
         method: 'POST',
-        body: new URLSearchParams({ address, latitude, longitude, user_type, user_id }),
+        body: new URLSearchParams({ address, latitude, longitude, user_type, license_number, user_id }),
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
 
@@ -222,6 +223,14 @@ async function populateProfile(userId) {
           <label>Address</label>
           <h5>${profile.address}</h5>
         </div>
+
+        ${profile.license_number ? `
+          <div class="form-group flex col mb-20">
+            <label>License Number</label>
+            <h5>${profile.license_number}</h5>
+          </div>
+        ` : ``}
+        
       </div>
     `;
   }
@@ -416,7 +425,7 @@ function populateVehiclesList(vehicles, parentElementId) {
                   </svg>
                 </button>
 
-                ${vehicle.status == 'Not Available'
+                ${vehicle.status == 'On-Rent'
                   ? `<button id="track-vehicle" class="vehicle-action track" data-id="${vehicle.vehicle_id}">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path fill="#fff" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
@@ -457,6 +466,42 @@ async function fetchVehicles(userId = '') {
 
     if (result.status === 200) {
       populateVehiclesList(result.data, '#user-vehicles');
+    } else {
+      showSnackbar(result.message || 'No vehicles found');
+    }
+  } catch (error) {
+    showSnackbar('An error occurred while fetching data.');
+  }
+}
+
+async function populateDashboard(userId = '') {
+
+  const user_id = getDataWithExpiryCheck('user_id');
+  const role = getDataWithExpiryCheck('role');
+  const user_type = getDataWithExpiryCheck('user_type');
+
+  try {
+    const url = `${server}/get_vehicles.php${userId ? '?owner_id=' + userId : ''}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result = await response.json();
+
+    if (result.status === 200) {
+      document.getElementById('vehicles_available').textContent = result.available;
+      document.getElementById('vehicles_not_available').textContent = result.not_available;
+
+      if(user_type == 0) {
+        document.getElementById('owner-vehicle-dashboard').style.display = 'none';
+
+        populateVehicleHistory();
+      } else {
+        document.getElementById('rent-vehicle-history').style.display = 'none';
+      }
+      
     } else {
       showSnackbar(result.message || 'No vehicles found');
     }
@@ -681,7 +726,7 @@ function initializeElements() {
 
 function initializeButtons() {
 
-  const buttonNavigations = document.querySelectorAll('.link');
+  const buttonNavigations = document.querySelectorAll('button');
 
   buttonNavigations.forEach((button) => {
     button.addEventListener('click', () => {
@@ -690,21 +735,26 @@ function initializeButtons() {
       const user_type = getDataWithExpiryCheck('user_type');
 
       if (user_type != 1) {
-        document.getElementById('view-my-vehicles').style.display = 'none';
+        const viewVehiclesBtn = document.getElementsByClassName('view-my-vehicles');
+
+        for (let i = 0; i < viewVehiclesBtn.length; i++) {
+          viewVehiclesBtn[i].style.display = 'none';
+        }
       }
 
       const activePanel = document.querySelector('.panel.active');
 
       switch (activePanel.id) {
+        case 'home':
+          if (user_id) populateDashboard(user_id);
+          break;
+
         case 'add-vehicle':
           if (user_id) initVehicleRegistrationMap();
           break;
 
         case 'view-vehicles':
-          if (user_id) {
-            fetchVehicles(user_id);
-          }
-
+          if (user_id) fetchVehicles(user_id);
           break;
 
         case 'search':
@@ -736,7 +786,9 @@ function initializeButtons() {
 
 async function init() {
   if (getDataWithExpiryCheck('user_id')) {
+    const user_id = getDataWithExpiryCheck('user_id');
     await populateData();
+    populateDashboard(user_id);
   }
   initializeElements();
   initializeButtons();
@@ -1095,8 +1147,40 @@ document.addEventListener('click', async function (event) {
   }
 });
 
+// Populate all vehicle history
+async function populateVehicleHistory() {
+
+  const user_id = getDataWithExpiryCheck('user_id');
+
+  try {
+    const url = `${server}/get_vehicles.php?get_history=true&user_id=${user_id}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result = await response.json();
+    console.log(result);
+
+    if (result.status === 200 && result.data) {
+      const histories = result.data;
+
+      populateVehicleRentHistoryList(histories, '#renter-vehicle-history');
+
+    } else {
+      showSnackbar('No history found');
+    }
+  } catch (error) {
+    console.error("Error fetching vehicle data:", error);
+    showSnackbar('An unexpected error occurred. Please try again.');
+  }
+}
+
 // Vehicle History
 document.addEventListener('click', async function (event) {
+
+  const user_id = getDataWithExpiryCheck("user_id");
 
   const actionBtn = event.target.closest(".vehicle-action.history");
 
@@ -1105,7 +1189,7 @@ document.addEventListener('click', async function (event) {
   const vehicleId = actionBtn.getAttribute("data-id");
 
   try {
-    const url = `${server}/get_vehicles.php?get_history=true&vehicle_id=${vehicleId}`;
+    const url = `${server}/get_vehicles.php?get_history=true&vehicle_id=${vehicleId}&user_id=${user_id}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -1170,7 +1254,11 @@ function populateVehicleHistoryList(histories, parentElementId) {
             <div class="badge ${badgeColor(history.status)}">
               ${history.status}
             </div>
-            
+            ${history.extend == 1 ? `
+              <div class="badge ${badgeColor(history.extend)}">
+                Extend
+              </div>
+              ` : ``}
           </div>
         </div>
       `;
@@ -1180,8 +1268,53 @@ function populateVehicleHistoryList(histories, parentElementId) {
   }
 }
 
+// List of Vehicle History
+function populateVehicleRentHistoryList(histories, parentElementId) {
 
-// Rent a Vehicle init
+  const user_type = getDataWithExpiryCheck('user_type');
+
+  const list = document.querySelector(parentElementId);
+  list.innerHTML = ''; // Clear existing data
+
+  if (histories.length === 0) {
+
+    const row = document.createElement('li');
+    row.innerHTML = `
+        <div class="flex pr-10">
+          <div class="w-100">
+            <h5>No results found!</h5>
+          </div>
+        </div>
+      `;
+    list.appendChild(row);
+
+  } else {
+
+    histories.forEach(history => {
+
+      const row = document.createElement('li');
+      row.innerHTML = `
+        <div class="w-100 mt-10">
+          <h5>Tricycle Number: <span>${history.number}</span></h5>
+          <h5>Date: <span>${formatTimestamp(history.timestamp)}</span></h5>
+          <div class="flex gap-10">
+            <h5>Status: </h5>
+            <div class="badge ${badgeColor(history.status)}">
+              ${history.status}
+            </div>
+            
+          </div>
+          ${history.due_status == 'Due' && history.transaction == ''? `<button class="extend-rent mt-10 btn primary w-100" data-id="${history.rental_id}">Extend Rent</button>` : ''}
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+  }
+}
+
+
+// Rent Vehicle init
 document.addEventListener('click', async function (event) {
   if (event.target.classList.contains('rent')) {
 
@@ -1225,7 +1358,7 @@ document.addEventListener('click', async function (event) {
   }
 });
 
-// Rent a Vehicle
+// Rent Vehicle
 document.getElementById('rentForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -1235,7 +1368,7 @@ document.getElementById('rentForm').addEventListener('submit', async function (e
   const status = 'Pending';
 
   try {
-    const response = await fetch(`${server}/rentals.php?action=rent_vehicle`, {
+    const response = await fetch(`${server}/rentals.php?action=rent_vehicle&extend=0`, {
       method: 'POST',
       body: new URLSearchParams({ vehicle_id, renter_id, duration, status }),
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1254,6 +1387,80 @@ document.getElementById('rentForm').addEventListener('submit', async function (e
     }
   } catch (error) {
     showSnackbar('An unexpected error occurred. Please try again.');
+  }
+});
+
+// Extend Rent Vehicle
+document.getElementById('extendRentForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const rental_id = document.getElementById('rental-id').value;
+  const vehicle_id = document.getElementById('extend-rent-vehicle-id').value;
+  const renter_id = document.getElementById('extend-rent-renter-id').value;
+  const duration = document.getElementById('extend-rent-duration').value;
+  const status = 'Pending';
+
+  try {
+    const response = await fetch(`${server}/rentals.php?action=rent_vehicle&extend=1&rental_id=${rental_id}`, {
+      method: 'POST',
+      body: new URLSearchParams({ vehicle_id, renter_id, duration, status }),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const result = await response.json();
+
+    if (result.status === 200) {
+      document.getElementById('extend-rent-vehicle').classList.remove('active');
+      document.getElementById('home').classList.add('active');
+
+      showSnackbar(result.message, 10);
+
+    } else {
+      showSnackbar(result.message);
+    }
+  } catch (error) {
+    showSnackbar('An unexpected error occurred. Please try again.');
+  }
+});
+
+// Extend Rent Vehicle
+document.addEventListener('click', async function (event) {
+  if (event.target.classList.contains('extend-rent')) {
+
+    document.getElementById('home').classList.remove('active');
+    document.getElementById('extend-rent-vehicle').classList.add('active');
+
+    const rentalId = event.target.attributes['data-id'].nodeValue;
+
+    try {
+      const url = `${server}/get_rent.php?rental_id=${rentalId}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const result = await response.json();
+
+      if (result.status === 200) {
+
+        const user_id = getDataWithExpiryCheck('user_id');
+        const rent = result.data;
+
+        // Populate data
+        document.getElementById('rental-id').value = rent.rental_id;
+        document.getElementById('extend-rent-vehicle-id').value = rent.vehicle_id;
+        document.getElementById('extend-rent-renter-id').value = user_id;
+        document.getElementById('extend-rent-vehicle-number').innerHTML = rent.number;
+        document.getElementById('extend-rent-vehicle-price').innerHTML = rent.price;
+
+      } else {
+        showSnackbar('Data not found.');
+      }
+    } catch (error) {
+      console.log(error);
+      showSnackbar('An unexpected error occurred. Please try again.');
+    }
   }
 });
 
@@ -1373,6 +1580,18 @@ async function fetchRental(rentalId, status) {
       const user_id = getDataWithExpiryCheck('user_id');
       const vehicle = result.data[0]; // First rental entry
       const distance = calculateDistance(latitude, longitude, parseFloat(vehicle.latitude), parseFloat(vehicle.longitude));
+
+      const extend = document.getElementById('extend-type');
+
+      if (extend && vehicle.extend == 1) {
+        extend.innerHTML = '';
+        const badge = document.createElement('div');
+    
+        badge.classList.add('badge', 'green');
+        badge.textContent = 'Extend';
+    
+        extend.appendChild(badge);
+      }
 
       // Populate data
       document.getElementById('vehicle-id').value = vehicle.vehicle_id;
@@ -1566,6 +1785,23 @@ document.addEventListener("DOMContentLoaded", function () {
     let pricePerDay = parseFloat(vehiclePrice.innerText) || 0;
     let total = days * pricePerDay;
     totalPrice.innerText = total.toLocaleString(); // Adds comma separators
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const extendRentDuration = document.getElementById("extend-rent-duration");
+  const extendVehiclePrice = document.getElementById("extend-rent-vehicle-price");
+  const extendTotalPrice = document.getElementById("extend-rent-total-price");
+
+  if (!extendRentDuration) {
+    return;
+  }
+
+  extendRentDuration.addEventListener("input", function () {
+    let days = parseInt(extendRentDuration.value) || 0;
+    let pricePerDay = parseFloat(extendVehiclePrice.innerText) || 0;
+    let total = days * pricePerDay;
+    extendTotalPrice.innerText = total.toLocaleString(); // Adds comma separators
   });
 });
 
@@ -1812,6 +2048,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });
+
+document.getElementById("user_type").addEventListener("change", function () {
+  var selectedValue = this.value;
+  var licenseDiv = document.getElementById("license_number_wrapper");
+  var licenseInput = document.getElementById("license_number");
+
+  if (selectedValue === "0") {
+    licenseDiv.style.display = "flex";
+    licenseInput.setAttribute("required", "required");
+  } else {
+    licenseDiv.style.display = "none";
+    licenseInput.removeAttribute("required");
+    licenseInput.value = "";
+  }
+});
+
+// Hide register_license_number_wrapper by default & set required if renter is pre-selected
+window.addEventListener("DOMContentLoaded", function () {
+  var userType = document.getElementById("user_type").value;
+  var licenseDiv = document.getElementById("license_number_wrapper");
+  var licenseInput = document.getElementById("license_number");
+
+  if (userType === "0") {
+    licenseDiv.style.display = "flex";
+    licenseInput.setAttribute("required", "required");
+  } else {
+    licenseDiv.style.display = "none";
+    licenseInput.removeAttribute("required");
+  }
+});
+
 
 // Carousel
 let currentIndex = 0;
